@@ -28,3 +28,7 @@ reports/**
 !reports/.gitkeep
 allure-results/
 allure-report/
+
+# AI
+.claude/
+.cursor/
