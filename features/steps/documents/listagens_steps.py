@@ -1,4 +1,4 @@
-"""Steps de listagens de documentos / pins / webhooks."""
+"""Steps de listagens de documentos / pins."""
 
 from __future__ import annotations
 
@@ -40,13 +40,6 @@ def listar_documentos_por_fase(context) -> None:  # noqa: ANN001
 def listar_documentos_do_cofre(context) -> None:  # noqa: ANN001
     safe_uuid = _require(Config.UUID_SAFE, "UUID_SAFE")
     context.response = context.documents_service.list_by_safe(safe_uuid)
-    context.response_json = context.response.json()
-
-
-@when("eu consulto os webhooks do documento configurado")
-def listar_webhooks(context) -> None:  # noqa: ANN001
-    document_uuid = _require(Config.UUID_WEBHOOK_DOCUMENT, "UUID_WEBHOOK_DOCUMENT")
-    context.response = context.documents_service.list_webhooks(document_uuid)
     context.response_json = context.response.json()
 
 

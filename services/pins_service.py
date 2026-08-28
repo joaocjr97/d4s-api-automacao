@@ -38,3 +38,15 @@ class PinsService:
     def list_pins(self, document_uuid: str) -> ApiResponse:
         """GET /documents/{uuid}/listpins."""
         return self._client.get(f"/documents/{document_uuid}/listpins")
+
+    def remove_pins(
+        self,
+        document_uuid: str,
+        pins: list[dict[str, Any]],
+    ) -> ApiResponse:
+        """POST /documents/{uuid}/removepins."""
+        return self._client.post(
+            f"/documents/{document_uuid}/removepins",
+            json_body={"pins": pins},
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+        )

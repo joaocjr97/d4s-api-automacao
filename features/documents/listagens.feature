@@ -2,7 +2,7 @@
 
 Funcionalidade: Listagens de documentos na API D4Sign
   Como consumidor da API D4Sign
-  Quero consultar documentos, webhooks e pins
+  Quero consultar documentos e pins
   Para validar os endpoints de listagem (GET)
 
   Contexto:
@@ -28,11 +28,6 @@ Funcionalidade: Listagens de documentos na API D4Sign
   @api @critical @documents
   Cenário: Listar documentos de um cofre específico
     Quando eu consulto os documentos do cofre configurado
-    Então a resposta deve ter status 200
-
-  @api @regression @documents @webhooks
-  Cenário: Listar webhooks de um documento específico
-    Quando eu consulto os webhooks do documento configurado
     Então a resposta deve ter status 200
 
   @api @signature @critical @documents @pins

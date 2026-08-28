@@ -31,10 +31,6 @@ class DocumentsService:
         """GET /documents/{safe_uuid}/safe — documentos de um cofre."""
         return self._client.get(f"/documents/{safe_uuid}/safe")
 
-    def list_webhooks(self, document_uuid: str) -> ApiResponse:
-        """GET /documents/{uuid}/webhooks."""
-        return self._client.get(f"/documents/{document_uuid}/webhooks")
-
     def list_pins(self, document_uuid: str) -> ApiResponse:
         """GET /documents/{uuid}/listpins."""
         return self._client.get(f"/documents/{document_uuid}/listpins")

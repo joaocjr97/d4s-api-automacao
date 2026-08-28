@@ -49,14 +49,14 @@ Não usa requests/urllib3 direto nos steps. O HTTP passa por `BaseClient` (HTTPX
 
 | Área | Feature | Cenários | Tags principais |
 |------|---------|----------|-----------------|
-| Listagens docs | `documents/listagens.feature` | 6 | `@api` `@documents` `@smoke` `@critical` |
+| Listagens docs | `documents/listagens.feature` | 5 | `@api` `@documents` `@smoke` `@critical` |
 | Listagens cofres | `safes/listagens.feature` | 1 | `@api` `@safes` `@smoke` |
 | Uploads | `documents/uploads.feature` | 4 | `@api` `@upload` `@documents` |
 | Signatários | `signers/fluxos.feature` | 3 | `@api` `@signature` `@signers` |
 | Pins | `pins/pins.feature` | 1 | `@api` `@pins` `@signature` `@critical` |
 | Templates | `templates/templates.feature` | 2 | `@api` `@template` `@templates` |
 | Webhooks | `webhooks/webhooks.feature` | 1 | `@api` `@webhooks` |
-| **Total** | **7 features** | **18** | |
+| **Total** | **7 features** | **17** | |
 
 ## Estrutura do projeto
 
@@ -196,7 +196,7 @@ Os UUIDs/templates precisam existir **na conta e no ambiente** do token. Valores
 ### Comandos úteis
 
 ```bash
-# Suíte completa (18 cenários)
+# Suíte completa (17 cenários)
 python -m behave features/ -f pretty
 
 # Por tag
