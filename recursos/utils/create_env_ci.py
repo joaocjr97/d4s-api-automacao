@@ -6,6 +6,8 @@ import os
 import sys
 from pathlib import Path
 
+from recursos.utils.config import _resolved_email
+
 ROOT = Path(__file__).resolve().parents[2]
 ENV_EXAMPLE = ROOT / ".env.exemplo"
 ENV_FILE = ROOT / ".env"
@@ -17,6 +19,12 @@ OVERRIDES = {
     "TOKEN_API": os.environ.get("TOKEN_API", ""),
     "CRYPT_KEY": os.environ.get("CRYPT_KEY", ""),
     "EMAIL_TESTE": os.environ.get("EMAIL_TESTE", ""),
+    "EXPECTED_PIN_EMAIL": _resolved_email(
+        os.environ.get("EXPECTED_PIN_EMAIL", ""),
+        os.environ.get("EMAIL_TESTE", ""),
+    ),
+    "EXPECTED_PIN_POSITION_X": os.environ.get("EXPECTED_PIN_POSITION_X") or "600",
+    "EXPECTED_PIN_PAGE_HEIGHT": os.environ.get("EXPECTED_PIN_PAGE_HEIGHT") or "1123.00",
     "EMAIL_ALTERADO": os.environ.get("EMAIL_ALTERADO", "signatario.alterado@teste.com"),
     "WHATSAPP_TESTE": os.environ.get("WHATSAPP_TESTE", ""),
     "UUID_SAFE": os.environ.get("UUID_SAFE", ""),

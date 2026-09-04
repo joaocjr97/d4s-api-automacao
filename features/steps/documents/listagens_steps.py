@@ -58,7 +58,10 @@ def validar_primeiro_pin(context) -> None:  # noqa: ANN001
     assert_not_empty(pins, message="lista pins")
 
     first_pin = pins[0]
-    expected_email = _require(Config.EXPECTED_PIN_EMAIL, "EXPECTED_PIN_EMAIL")
+    expected_email = _require(
+        Config.EXPECTED_PIN_EMAIL or Config.EMAIL_TESTE,
+        "EXPECTED_PIN_EMAIL (ou EMAIL_TESTE)",
+    )
     assert_equals(first_pin.get("email"), expected_email, message="pin.email")
     assert_equals(
         int(first_pin.get("position_x")),

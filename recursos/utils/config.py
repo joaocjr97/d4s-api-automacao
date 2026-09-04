@@ -12,6 +12,15 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
+def _resolved_email(*candidates: str) -> str:
+    """Primeiro e-mail real; ignora vazio e placeholders de `.env.exemplo`."""
+    for value in candidates:
+        cleaned = (value or "").strip()
+        if cleaned and not cleaned.lower().endswith("@exemplo.com"):
+            return cleaned
+    return ""
+
+
 class Config:
     _loaded = False
 
@@ -90,7 +99,7 @@ class Config:
         cls.PASSWORD = os.getenv("D4S_PASSWORD") or os.getenv("PASSWORD", "")
         cls.TOKEN_API = os.getenv("TOKEN_API", "")
         cls.CRYPT_KEY = os.getenv("CRYPT_KEY", "")
-        cls.EMAIL_TESTE = os.getenv("EMAIL_TESTE", "")
+        cls.EMAIL_TESTE = _resolved_email(os.getenv("EMAIL_TESTE", ""))
         cls.EMAIL_ALTERADO = os.getenv(
             "EMAIL_ALTERADO",
             "signatario.alterado@teste.com",
@@ -138,7 +147,10 @@ class Config:
             int(os.getenv("TYPE_2", "2")),
         )
 
-        cls.EXPECTED_PIN_EMAIL = os.getenv("EXPECTED_PIN_EMAIL", "")
+        cls.EXPECTED_PIN_EMAIL = _resolved_email(
+            os.getenv("EXPECTED_PIN_EMAIL", ""),
+            cls.EMAIL_TESTE,
+        )
         cls.EXPECTED_PIN_POSITION_X = int(os.getenv("EXPECTED_PIN_POSITION_X", "600"))
         cls.EXPECTED_PIN_PAGE_HEIGHT = os.getenv("EXPECTED_PIN_PAGE_HEIGHT", "1123.00")
 

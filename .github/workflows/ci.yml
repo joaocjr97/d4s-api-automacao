@@ -44,6 +44,9 @@ jobs:
           TOKEN_API: ${{ secrets.TOKEN_API }}
           CRYPT_KEY: ${{ secrets.CRYPT_KEY }}
           EMAIL_TESTE: ${{ secrets.EMAIL_TESTE }}
+          EXPECTED_PIN_EMAIL: ${{ secrets.EXPECTED_PIN_EMAIL }}
+          EXPECTED_PIN_POSITION_X: ${{ vars.EXPECTED_PIN_POSITION_X }}
+          EXPECTED_PIN_PAGE_HEIGHT: ${{ vars.EXPECTED_PIN_PAGE_HEIGHT }}
           WHATSAPP_TESTE: ${{ secrets.WHATSAPP_TESTE }}
           UUID_SAFE: ${{ secrets.UUID_SAFE }}
           LIST_ESPECIFIC_DOCUMENT: ${{ secrets.LIST_ESPECIFIC_DOCUMENT }}
