@@ -1,4 +1,4 @@
-name: D4Sign API Tests (Behave)
+name: Automação API
 
 on:
   push:
@@ -20,9 +20,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: write
     env:
       CI: "true"
       PYTHONUNBUFFERED: "1"
+      PYTHONPATH: ${{ github.workspace }}
+      BEHAVE_ENV: ${{ github.event.inputs.environment || vars.ENVIRONMENT || 'homol' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -38,7 +43,7 @@ jobs:
 
       - name: Create .env from secrets
         env:
-          ENVIRONMENT: ${{ github.event.inputs.environment || vars.ENVIRONMENT || 'homol' }}
+          ENVIRONMENT: ${{ env.BEHAVE_ENV }}
           D4S_USERNAME: ${{ secrets.USERNAME }}
           D4S_PASSWORD: ${{ secrets.PASSWORD }}
           TOKEN_API: ${{ secrets.TOKEN_API }}
@@ -60,18 +65,18 @@ jobs:
       - name: List scenarios (dry-run)
         run: |
           echo "=== Cenários planejados ==="
-          python -u -m behave features/ --dry-run --format progress
+          python -u -m behave features/ --dry-run --format progress -D "env=${BEHAVE_ENV}"
           echo "==========================="
 
       - name: Run Behave tests
         id: behave
         continue-on-error: true
+        shell: bash
         env:
-          BEHAVE_ENV: ${{ github.event.inputs.environment || vars.ENVIRONMENT || 'homol' }}
+          BEHAVE_TAGS: ${{ github.event.inputs.tags }}
         run: |
           mkdir -p reports/allure-results
-          TAGS="${{ github.event.inputs.tags }}"
-          # -D env sobrescreve behave.ini (env=hml) e alinha com o ENVIRONMENT do .env
+          # -D env sobrescreve behave.ini (env=prod) e alinha com o ENVIRONMENT do .env
           CMD=(
             python -u -m behave features/
             -D "env=${BEHAVE_ENV}"
@@ -83,14 +88,18 @@ jobs:
             --format json.pretty --outfile reports/behave.json
             -f allure_behave.formatter:AllureFormatter -o reports/allure-results
           )
-          if [ -n "$TAGS" ]; then
-            CMD+=(--tags="$TAGS")
+          if [ -n "$BEHAVE_TAGS" ]; then
+            CMD+=(--tags="$BEHAVE_TAGS")
           fi
           echo "=== Início $(date -u +%H:%M:%S) UTC | env=${BEHAVE_ENV} ==="
           echo "Comando: ${CMD[*]}"
+          # O bash do Actions já liga `set -e` e `pipefail`. Sem `set +e`,
+          # a falha do Behave encerra o step antes do log e do exit code.
           set -o pipefail
+          set +e
           stdbuf -oL -eL "${CMD[@]}" 2>&1 | tee reports/behave_console.log
           EXIT_CODE=${PIPESTATUS[0]}
+          set -e
           echo "=== Fim $(date -u +%H:%M:%S) UTC | exit=${EXIT_CODE} ==="
           ls -la reports/ || true
           echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
@@ -112,7 +121,12 @@ jobs:
       - name: Fail if tests failed
         if: always()
         run: |
-          if [ "${{ steps.behave.outcome }}" != "success" ]; then
+          OUTCOME="${{ steps.behave.outcome }}"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "Behave não executou (passo anterior falhou)."
+            exit 1
+          fi
+          if [ "$OUTCOME" != "success" ]; then
             echo "Testes Behave falharam."
             exit 1
           fi

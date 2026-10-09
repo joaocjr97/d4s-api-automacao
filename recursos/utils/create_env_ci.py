@@ -1,4 +1,9 @@
-"""Gera .env no CI a partir de variáveis de ambiente / secrets."""
+"""Gera .env no CI a partir de variáveis de ambiente / secrets.
+
+O workflow chama `python recursos/utils/create_env_ci.py`. Nesse modo o
+Python coloca `recursos/utils` no sys.path, e não a raiz do repositório,
+então `import recursos` falha. A helper de e-mail fica neste arquivo.
+"""
 
 from __future__ import annotations
 
@@ -6,14 +11,60 @@ import os
 import sys
 from pathlib import Path
 
-from recursos.utils.config import _resolved_email
-
 ROOT = Path(__file__).resolve().parents[2]
 ENV_EXAMPLE = ROOT / ".env.exemplo"
 ENV_FILE = ROOT / ".env"
 
+# Aliases batem com Config.load (hml → homol, dev → ghost).
+ALLOWED_ENVIRONMENTS = {
+    "ghost",
+    "homol",
+    "staging",
+    "hotfix",
+    "prod",
+    "hml",
+    "dev",
+    "development",
+}
+
+
+def _resolved_email(*candidates: str) -> str:
+    """Primeiro e-mail real; ignora vazio e placeholders de `.env.exemplo`."""
+    for value in candidates:
+        cleaned = (value or "").strip()
+        if cleaned and not cleaned.lower().endswith("@exemplo.com"):
+            return cleaned
+    return ""
+
+
+def _quote_env(value: str) -> str:
+    """Aspas simples: `#` não vira comentário e `$` não é interpolado pelo dotenv."""
+    escaped = value.replace("\\", "\\\\").replace("'", "\\'")
+    return f"'{escaped}'"
+
+
+def _preflight() -> str:
+    environment = OVERRIDES["ENVIRONMENT"]
+    if environment not in ALLOWED_ENVIRONMENTS:
+        allowed = ", ".join(sorted({"ghost", "homol", "staging", "hotfix", "prod"}))
+        return f"ENVIRONMENT inválido: {environment!r}. Use: {allowed}."
+
+    missing = [
+        key
+        for key in ("TOKEN_API", "CRYPT_KEY")
+        if not OVERRIDES.get(key) or str(OVERRIDES[key]).startswith("sua_")
+    ]
+    if missing:
+        return f"Secrets ausentes ou placeholder: {', '.join(missing)}"
+
+    multiline = [key for key, value in OVERRIDES.items() if "\n" in str(value) or "\r" in str(value)]
+    if multiline:
+        return f"Valor com quebra de linha (o .env ficaria inválido): {', '.join(multiline)}"
+    return ""
+
+
 OVERRIDES = {
-    "ENVIRONMENT": os.environ.get("ENVIRONMENT", "homol"),
+    "ENVIRONMENT": (os.environ.get("ENVIRONMENT") or "homol").strip().lower(),
     "D4S_USERNAME": os.environ.get("D4S_USERNAME", ""),
     "D4S_PASSWORD": os.environ.get("D4S_PASSWORD", ""),
     "TOKEN_API": os.environ.get("TOKEN_API", ""),
@@ -50,6 +101,11 @@ def main() -> int:
         print(f"Arquivo não encontrado: {ENV_EXAMPLE}", file=sys.stderr)
         return 1
 
+    error = _preflight()
+    if error:
+        print(error, file=sys.stderr)
+        return 1
+
     lines: list[str] = []
     for raw in ENV_EXAMPLE.read_text(encoding="utf-8").splitlines():
         if not raw.strip() or raw.strip().startswith("#"):
@@ -57,16 +113,11 @@ def main() -> int:
             continue
         key = raw.split("=", 1)[0].strip()
         if key in OVERRIDES:
-            lines.append(f"{key}={OVERRIDES[key]}")
+            lines.append(f"{key}={_quote_env(str(OVERRIDES[key]))}")
         else:
             lines.append(raw)
 
     ENV_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-    missing = [key for key in ("TOKEN_API", "CRYPT_KEY") if not OVERRIDES.get(key)]
-    if missing:
-        print(f"Secrets ausentes: {', '.join(missing)}", file=sys.stderr)
-        return 1
 
     print(f".env criado em {ENV_FILE}")
     print(f"ENVIRONMENT={OVERRIDES['ENVIRONMENT']}")

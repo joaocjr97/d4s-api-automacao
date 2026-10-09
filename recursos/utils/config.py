@@ -82,7 +82,8 @@ class Config:
             return
 
         root = cls.project_root()
-        load_dotenv(root / ".env", override=True)
+        # interpolate=False: secrets com `$` permanecem literais.
+        load_dotenv(root / ".env", override=True, interpolate=False)
 
         environment = (
             env_override
@@ -151,8 +152,8 @@ class Config:
             os.getenv("EXPECTED_PIN_EMAIL", ""),
             cls.EMAIL_TESTE,
         )
-        cls.EXPECTED_PIN_POSITION_X = int(os.getenv("EXPECTED_PIN_POSITION_X", "600"))
-        cls.EXPECTED_PIN_PAGE_HEIGHT = os.getenv("EXPECTED_PIN_PAGE_HEIGHT", "1123.00")
+        cls.EXPECTED_PIN_POSITION_X = int(os.getenv("EXPECTED_PIN_POSITION_X") or "600")
+        cls.EXPECTED_PIN_PAGE_HEIGHT = os.getenv("EXPECTED_PIN_PAGE_HEIGHT") or "1123.00"
 
         cls.HTTP_TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "30"))
         cls.HTTP_MAX_RETRIES = int(os.getenv("HTTP_MAX_RETRIES", "3"))

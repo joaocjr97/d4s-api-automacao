@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -16,9 +17,21 @@ def _load_stats() -> dict[str, int]:
     if not BEHAVE_JSON.exists() or BEHAVE_JSON.stat().st_size == 0:
         return stats
 
-    data = json.loads(BEHAVE_JSON.read_text(encoding="utf-8"))
+    try:
+        data = json.loads(BEHAVE_JSON.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"JSON do Behave ilegível: {exc}", file=sys.stderr)
+        return stats
+    if not isinstance(data, list):
+        print("JSON do Behave não é uma lista de features.", file=sys.stderr)
+        return stats
+
     for feature in data:
-        for element in feature.get("elements", []):
+        if not isinstance(feature, dict):
+            continue
+        for element in feature.get("elements") or []:
+            if not isinstance(element, dict):
+                continue
             if element.get("type") not in {"scenario", "scenario_outline"}:
                 continue
             stats["total"] += 1
