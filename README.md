@@ -112,7 +112,7 @@ template-api-tests-python/
 - Python **3.13+** (alinhado ao `pyproject.toml` / CI)
 - `pip`
 - Conta de teste na D4Sign com **token API** e **crypt key**
-- UUIDs / templates do **mesmo ambiente** do token (homol, ghost, staging…)
+- UUIDs / templates do **mesmo ambiente** do token (homol, staging…)
 
 ## Instalação
 
@@ -145,7 +145,7 @@ Copie de `.env.exemplo`. Variáveis principais:
 
 | Variável | Padrão | Descrição |
 |----------|--------|-----------|
-| `ENVIRONMENT` | `homol` | `prod`, `ghost`, `homol`, `staging`, `hotfix` |
+| `ENVIRONMENT` | `homol` | `prod`, `homol`, `staging`, `hotfix` |
 | `D4S_USERNAME` | — | E-mail (opcional; `D4S_` evita conflito com `USERNAME` do Windows) |
 | `D4S_PASSWORD` | — | Senha (opcional para API) |
 | `TOKEN_API` | — | Token da API (**obrigatório**) |
@@ -173,7 +173,6 @@ Pins (`PAGE_*`, `POS_*`, `EXPECTED_PIN_*`) também ficam no `.env` — ver `.env
 |---------------|-----------------|
 | `prod` | `https://secure.d4sign.com.br/api/v1` |
 | `homol` | `https://homol.d4sign.com.br/api/v1` |
-| `ghost` | `https://ghost.d4sign.com.br/api/v1` |
 | `staging` | `https://stage.d4sign.com.br/api/v1` |
 | `hotfix` | `https://hotfix.d4sign.com.br/api/v1` |
 
