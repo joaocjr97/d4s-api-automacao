@@ -117,8 +117,8 @@ template-api-tests-python/
 ## Instalação
 
 ```bash
-git clone https://github.com/joaocjr97/D4S-API-Automacao.git
-cd d4sign-api-tests-playwright
+git clone https://github.com/joaocjr97/d4s-api-automacao.git
+cd d4s-api-automacao
 
 python -m venv venv
 
@@ -137,7 +137,7 @@ copy .env.exemplo .env
 cp .env.exemplo .env
 ```
 
-Edite o `.env` com credenciais e UUIDs reais. Prefira ambientes de QA (`homol`, `ghost`, `staging`, `hotfix`). Evite `prod` na automação local, salvo necessidade explícita.
+Edite o `.env` com credenciais e UUIDs reais. Prefira ambientes de QA (`homol`, `staging`, `hotfix`). Evite `prod` na automação local, salvo necessidade explícita.
 
 ## Configuração (.env)
 
