@@ -12,7 +12,7 @@ on:
         required: false
         default: ""
       environment:
-        description: "Ambiente (homol, ghost, staging, hotfix, prod)"
+        description: "Ambiente (homol, staging, hotfix, prod)"
         required: false
         default: "homol"
 
